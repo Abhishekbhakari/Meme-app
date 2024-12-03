@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 function App() {
 
   const [memes, setMemes] = useState([]);
+  const [showShimmer, setShowShimmer] = useState(false);
   // const [currentPage, setCurrentPage] = useState(1);
   // const [postsPerPage] = useState(6);
 
@@ -18,11 +19,25 @@ function App() {
 
   useEffect(() => {
     featchMemes();
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    }
+
   },[]);
 
+  const handleScroll = () => {
+    if (window.scrollY + window.innerHeight >= document.body.scrollHeight ) {
+      featchMemes();
+    }
+  }
   const featchMemes = async () => {
+    setShowShimmer(true);
     const response = await axios.get('https://meme-api.com/gimme/20');
-    setMemes(response.data.memes);
+    setMemes((memes) => [...memes, ...response.data.memes]);
+    setShowShimmer(false);
     console.log(response.data);
   }
   return (
